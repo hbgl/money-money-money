@@ -40,3 +40,7 @@ const { Money } = require('moneta');
 const money = new Money('985474263166349355', 'IRR');
 console.assert('IRR 985,474,263,166,349,300' === money.toLocaleStringUnchecked());
 ```
+
+## License
+
+This library is licensed under the [MIT license](https://opensource.org/licenses/MIT).
