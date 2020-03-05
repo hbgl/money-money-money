@@ -1,5 +1,7 @@
 # Money Money Money
 
+[![Build Status](https://travis-ci.org/hbgl/money-money-money.svg?branch=master)](https://travis-ci.org/hbgl/money-money-money)
+
 <span style="color:firebrick;font-size:2em;">**This is a pre-release version. Use at your own risk.**</span>
 
 A JavaScript library for dealing with money safely.
