@@ -41,3 +41,7 @@ const money = new Money('985474263166349355', 'IRR');
 console.assert('IRR 985,474,263,166,349,300' === money.toLocaleString(undefined, { precisionHandling: 'unchecked' }));
 console.assert('~ IRR 985,474,263,166,349,300' === money.toLocaleString(undefined, { precisionHandling: 'show_imprecision' }));
 ```
+
+## License
+
+This library is licensed under the [MIT license](https://opensource.org/licenses/MIT).
