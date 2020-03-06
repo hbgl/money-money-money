@@ -1,6 +1,6 @@
 const { describe, it } = require('mocha');
 const assert = require('chai').assert;
-const { Money } = require('./index.js');
+const { Money, RoundingMode, PrecisionHandling } = require('./index.js');
 const Big = require('big.js');
 const _ = require('lodash');
 
@@ -18,13 +18,6 @@ const unsafeNumbers = [
     '12341234123412341234.12',
     '1234123412341235.51',
 ];
-
-const RoundingMode = {
-    '0': 'down',
-    '3': 'up',
-    '1': 'half up',
-    '2': 'half down',
-};
 
 // ISO 4217 currency codes
 const Currencies = ['AFN', 'EUR', 'ALL', 'DZD', 'USD', 'EUR', 'AOA', 'XCD', 'XCD', 'ARS', 'AMD', 'AWG', 'AUD', 'EUR', 'AZN', 'BSD', 'BHD', 'BDT', 'BBD', 'BYN', 'EUR', 'BZD', 'XOF', 'BMD', 'INR', 'BTN', 'BOB', 'BOV', 'USD', 'BAM', 'BWP', 'NOK', 'BRL', 'USD', 'BND', 'BGN', 'XOF', 'BIF', 'CVE', 'KHR', 'XAF', 'CAD', 'KYD', 'XAF', 'XAF', 'CLP', 'CLF', 'CNY', 'AUD', 'AUD', 'COP', 'COU', 'KMF', 'CDF', 'XAF', 'NZD', 'CRC', 'XOF', 'HRK', 'CUP', 'CUC', 'ANG', 'EUR', 'CZK', 'DKK', 'DJF', 'XCD', 'DOP', 'USD', 'EGP', 'SVC', 'USD', 'XAF', 'ERN', 'EUR', 'ETB', 'EUR', 'FKP', 'DKK', 'FJD', 'EUR', 'EUR', 'EUR', 'XPF', 'EUR', 'XAF', 'GMD', 'GEL', 'EUR', 'GHS', 'GIP', 'EUR', 'DKK', 'XCD', 'EUR', 'USD', 'GTQ', 'GBP', 'GNF', 'XOF', 'GYD', 'HTG', 'USD', 'AUD', 'EUR', 'HNL', 'HKD', 'HUF', 'ISK', 'INR', 'IDR', 'XDR', 'IRR', 'IQD', 'EUR', 'GBP', 'ILS', 'EUR', 'JMD', 'JPY', 'GBP', 'JOD', 'KZT', 'KES', 'AUD', 'KPW', 'KRW', 'KWD', 'KGS', 'LAK', 'EUR', 'LBP', 'LSL', 'ZAR', 'LRD', 'LYD', 'CHF', 'EUR', 'EUR', 'MOP', 'MKD', 'MGA', 'MWK', 'MYR', 'MVR', 'XOF', 'EUR', 'USD', 'EUR', 'MRU', 'MUR', 'EUR', 'XUA', 'MXN', 'MXV', 'USD', 'MDL', 'EUR', 'MNT', 'EUR', 'XCD', 'MAD', 'MZN', 'MMK', 'NAD', 'ZAR', 'AUD', 'NPR', 'EUR', 'XPF', 'NZD', 'NIO', 'XOF', 'NGN', 'NZD', 'AUD', 'USD', 'NOK', 'OMR', 'PKR', 'USD', 'PAB', 'USD', 'PGK', 'PYG', 'PEN', 'PHP', 'NZD', 'PLN', 'EUR', 'USD', 'QAR', 'EUR', 'RON', 'RUB', 'RWF', 'EUR', 'SHP', 'XCD', 'XCD', 'EUR', 'EUR', 'XCD', 'WST', 'EUR', 'STN', 'SAR', 'XOF', 'RSD', 'SCR', 'SLL', 'SGD', 'ANG', 'XSU', 'EUR', 'EUR', 'SBD', 'SOS', 'ZAR', 'SSP', 'EUR', 'LKR', 'SDG', 'SRD', 'NOK', 'SZL', 'SEK', 'CHF', 'CHE', 'CHW', 'SYP', 'TWD', 'TJS', 'TZS', 'THB', 'USD', 'XOF', 'NZD', 'TOP', 'TTD', 'TND', 'TRY', 'TMT', 'USD', 'AUD', 'UGX', 'UAH', 'AED', 'GBP', 'USD', 'USD', 'USN', 'UYU', 'UYI', 'UYW', 'UZS', 'VUV', 'VES', 'VND', 'USD', 'USD', 'XPF', 'MAD', 'YER', 'ZMW', 'ZWL', 'XBA', 'XBB', 'XBC', 'XBD', 'XTS', 'XXX', 'XAU', 'XPD', 'XPT', 'XAG'];
@@ -96,10 +89,10 @@ describe('construct', () => {
         [m('0.17', EUR), '.173', EUR],
         [m('-0.17', EUR), '-.173', EUR],
         [m('0.18', EUR), '0.175', EUR],
-        [m('0.18', EUR), '0.173', EUR, Money.ROUND_UP],
-        [m('0.17', EUR), '0.175', EUR, Money.ROUND_DOWN],
-        [m('-0.18', EUR), '-0.173', EUR, Money.ROUND_UP],
-        [m('-0.17', EUR), '-0.175', EUR, Money.ROUND_DOWN],
+        [m('0.18', EUR), '0.173', EUR, RoundingMode.up],
+        [m('0.17', EUR), '0.175', EUR, RoundingMode.down],
+        [m('-0.18', EUR), '-0.173', EUR, RoundingMode.up],
+        [m('-0.17', EUR), '-0.175', EUR, RoundingMode.down],
         [m('0.175', IQD), '0.175', IQD],
         [m('0.175', IQD), '0.1753', IQD],
         [m('0.176', IQD), '0.1755', IQD],
@@ -111,7 +104,7 @@ describe('construct', () => {
         const [amount, currency, roundingMode] = test;
         let title = null;
         if (roundingMode !== undefined) {
-            title = `constructs ${currency} ${amount} rounding ${RoundingMode[roundingMode]} as ${expected.toLocaleString()}`;
+            title = `constructs ${currency} ${amount} rounding ${roundingMode} as ${expected.toLocaleString()}`;
         } else {
             title = `constructs ${currency} ${amount} as ${expected.toLocaleString()}`;
         }
@@ -222,13 +215,13 @@ describe('mul', () => {
         [m('5.55', EUR), m('3.17', EUR), 1.75],
         [m('5.55', EUR), m('3.17', EUR), '1.75'],
         [m('5.55', EUR), m('3.17', EUR), b('1.75')],
-        [m('5.54', EUR), m('3.17', EUR), '1.75', Money.ROUND_DOWN],
+        [m('5.54', EUR), m('3.17', EUR), '1.75', RoundingMode.down],
     ];
     tests.forEach(test => {
         const [expected, money, factor, roundingMode] = test;
         let title = `${money.toLocaleString()} * ${factor instanceof Big ? factor.toFixed() : factor} = ${expected.toLocaleString()}`;
         if (roundingMode !== undefined) {
-            title += ` rounding ${RoundingMode[roundingMode]}`;
+            title += ` rounding ${roundingMode}`;
         }
         it(title, () => {
             const product = money.mul(factor, roundingMode);
@@ -241,13 +234,13 @@ describe('div', () => {
     const tests = [
         [m('0.63', EUR), m('3.17', EUR), 5],
         [m('0.01', EUR), m('0.50', EUR), 100],
-        [m('0.00', EUR), m('0.50', EUR), 100, Money.ROUND_DOWN],
+        [m('0.00', EUR), m('0.50', EUR), 100, RoundingMode.down],
     ];
     tests.forEach(test => {
         const [expected, dividend, divisor, roundingMode] = test;
         let title = `${dividend.toLocaleString()} / ${divisor instanceof Big ? divisor.toFixed() : divisor} = ${expected.toLocaleString()}`;
         if (roundingMode !== undefined) {
-            title += ` rounding ${RoundingMode[roundingMode]}`;
+            title += ` rounding ${roundingMode}`;
         }
         it(title, () => {
             const quotient = dividend.div(divisor, roundingMode);
@@ -430,9 +423,7 @@ describe('ratioOf', () => {
 const toLocaleStringTests = [
     ['€1,000.00', m('1000.00', EUR), 'en'],
     ['-€1,000.00', m('-1000.00', EUR), 'en'],
-    ['1,000', m('1000.00', EUR), 'en', {
-        style: 'decimal',
-    }],
+    ['1,000', m('1000.00', EUR), 'en', { style: 'decimal' }],
 ];
 
 describe('toString', () => {
@@ -456,69 +447,126 @@ describe('toDecimalString', () => {
 });
 
 describe('toLocaleString', () => {
-    toLocaleStringTests.forEach(test => {
-        const [expected, money, locale, options] = test;
-        let title = `of ${money} equals '${expected}' with '${locale}'`;
-        if (options !== undefined) {
-            title += ` and options ${JSON.stringify(options)}`;
-        }
-        it(title, () => {
-            const formatted = money.toLocaleString(locale, options);
-            assert.equal(expected, formatted);
+    describe('with \'safe\' precision handling', () => {
+        toLocaleStringTests.forEach(test => {
+            const [expected, money, locale, options] = test;
+            let title = `of ${money} equals '${expected}' for locale '${locale}'`;
+            if (options !== undefined) {
+                title += ` and options ${JSON.stringify(options)}`;
+            }
+            it(title, () => {
+                let formatOptions = Object.assign({ precisionHandling: PrecisionHandling.safe }, options);
+                const formatted = money.toLocaleString(locale, formatOptions);
+                assert.equal(expected, formatted);
+            });
+        });
+
+        unsafeNumbers.forEach(unsafeNumber => {
+            it(`throws on unsafe Number ${unsafeNumber}`, () => {
+                const money = m(unsafeNumber, EUR);
+                assert.throws(() => money.toLocaleString(undefined, { precisionHandling: PrecisionHandling.safe }));
+            });
+        });
+    });
+
+    describe('with \'unchecked\' precision handling', () => {
+        it('works like \'safe\' precision handling for safe numbers', () => {
+            toLocaleStringTests.forEach(test => {
+                const [_, money, locale, options] = test;
+                let formatOptions = Object.assign({ precisionHandling: PrecisionHandling.unchecked }, options);
+                const expected = money.toLocaleString(locale, formatOptions);
+                const formatted = money.toLocaleString(locale, formatOptions);
+                assert.equal(expected, formatted);
+            });
+        });
+
+        const unsafeNumberTests = [
+            ['€12,341,234,123,412,340,000.00', m('12341234123412341234.12', EUR), 'en'],
+            ['€1,234,123,412,341,235.50', m('1234123412341235.51', EUR), 'en'],
+            ['€1234123412341235.5', m('1234123412341235.51', EUR), 'en', { useGrouping: false, minimumFractionDigits: 1, maximumFractionDigits: 1 }],
+        ];
+        unsafeNumberTests.forEach(test => {
+            const [expected, money, locale, options] = test;
+            let title = `of ${money} equals '${expected}' for locale '${locale}'`;
+            if (options !== undefined) {
+                title += ` and options ${JSON.stringify(options)}`;
+            }
+            it(title, () => {
+                const formatOptions = Object.assign({ precisionHandling: PrecisionHandling.unchecked }, options);
+                const formatted = money.toLocaleString(locale, formatOptions);
+                assert.equal(expected, formatted);
+            });
+        });
+    });
+
+    describe('with \'show_imprecision\' precision handling', () => {
+        it('works like \'safe\' precision handling for safe numbers', () => {
+            toLocaleStringTests.forEach(test => {
+                const [_, money, locale, options] = test;
+                let formatOptions = Object.assign({ precisionHandling: PrecisionHandling.show_imprecision }, options);
+                const expected = money.toLocaleString(locale, formatOptions);
+                const formatted = money.toLocaleString(locale, formatOptions);
+                assert.equal(expected, formatted);
+            });
+        });
+
+        const unsafeNumberTests = [
+            ['~ €12,341,234,123,412,340,000.00', m('12341234123412341234.12', EUR), 'en'],
+            ['~ €1,234,123,412,341,235.50', m('1234123412341235.51', EUR), 'en'],
+            ['~ €1234123412341235.5', m('1234123412341235.51', EUR), 'en', { useGrouping: false, minimumFractionDigits: 1, maximumFractionDigits: 1 }],
+        ];
+        unsafeNumberTests.forEach(test => {
+            const [expected, money, locale, options] = test;
+            let title = `of ${money} equals '${expected}' for locale '${locale}'`;
+            if (options !== undefined) {
+                title += ` and options ${JSON.stringify(options)}`;
+            }
+            it(title, () => {
+                const formatOptions = Object.assign({ precisionHandling: PrecisionHandling.show_imprecision }, options);
+                const formatted = money.toLocaleString(locale, formatOptions);
+                assert.equal(expected, formatted);
+            });
+        });
+
+        describe('with customized imprecision formatting', () => {
+            class MoneyCustomImprecision extends Money {
+                formatImprecision(formatted, locale, options) {
+                    if (locale === 'en-US') {
+                        return `around ${formatted} or so`;
+                    } else if (locale === 'en-UK') {
+                        return `circa ${formatted}`;
+                    }
+                    return super.formatImprecision(formatted, locale, options);
+                }
+            }
+            const customizeImprecisionTests = [
+                ['around €12,341,234,123,412,340,000.00 or so', new MoneyCustomImprecision('12341234123412341234.12', EUR), 'en-US'],
+                ['circa €12,341,234,123,412,340,000.00', new MoneyCustomImprecision('12341234123412341234.12', EUR), 'en-UK'],
+            ];
+            customizeImprecisionTests.forEach(test => {
+                const [expected, money, locale] = test;
+                let title = `of ${money} equals '${expected}' for locale '${locale}'`;
+                it(title, () => {
+                    const formatted = money.toLocaleString(locale, { precisionHandling: PrecisionHandling.show_imprecision });
+                    assert.equal(expected, formatted);
+                });
+            });
         });
     });
 
     it('cannot override currency', () => {
-        const formatted = m('1000.00', EUR).toLocaleString('en', {
-            currency: USD,
-        });
-        assert.equal('€1,000.00', formatted);
-    });
-
-    unsafeNumbers.forEach(unsafeNumber => {
-        it(`throws on unsafe Number ${unsafeNumber}`, () => {
-            const money = m(unsafeNumber, EUR);
-            assert.throws(() => money.toLocaleString());
-        });
+        assert.throws(() => m('1000.00', EUR).toLocaleString('en', { currency: USD }));
     });
 
     it('falls back to default locale and options', () => {
-        assert.doesNotThrow(() => m('10.00', EUR).toLocaleString());
-    });
-});
-
-describe('toLocaleStringUnchecked', () => {
-    toLocaleStringTests.forEach(test => {
-        const [_, money, locale, options] = test;
-        const expected = money.toLocaleString(locale, options);
-        let title = `of ${money} equals '${expected}' with locale '${locale}'`;
-        if (options !== undefined) {
-            title += ` and options ${JSON.stringify(options)}`;
-        }
-        it(title, () => {
-            const formatted = money.toLocaleStringUnchecked(locale, options);
-            assert.equal(expected, formatted);
-        });
+        assert.doesNotThrow(() => m(safeNumbers[0], EUR).toLocaleString());
+        assert.throws(() => m(unsafeNumbers[0], EUR).toLocaleString());
     });
 
-    const unsafeNumberTests = [
-        ['€12,341,234,123,412,340,000.00', m('12341234123412341234.12', EUR), 'en'],
-        ['€1,234,123,412,341,235.50', m('1234123412341235.51', EUR), 'en'],
-        ['€1234123412341235.5', m('1234123412341235.51', EUR), 'en', {
-            useGrouping: false,
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1,
-        }],
-    ];
-    unsafeNumberTests.forEach(test => {
-        const [expected, money, locale, options] = test;
-        let title = `of ${money} equals '${expected}' with locale '${locale}'`;
-        if (options !== undefined) {
-            title += ` and options ${JSON.stringify(options)}`;
-        }
-        it(title, () => {
-            const formatted = money.toLocaleStringUnchecked(locale, options);
-            assert.equal(expected, formatted);
+    it('rejects invalid values for precisionHandling option', () => {
+        const invalidPrecisionHandlingValues = [null, true, {}, [], 123, 'SAFE', 'foobar'];
+        invalidPrecisionHandlingValues.forEach(value => {
+            assert.throws(() => m('10.00', EUR).toLocaleString(undefined, { precisionHandling: value }));
         });
     });
 });
@@ -641,8 +689,8 @@ describe('customBig', () => {
         });
     });
 
-    const customRoundingMode = Money.ROUND_UP;
-    describe(`with custom rounding mode '${RoundingMode[customRoundingMode]}'`, () => {
+    const customRoundingMode = RoundingMode.up;
+    describe(`with custom rounding mode '${customRoundingMode}'`, () => {
         const BigUp = Big();
         BigUp.RM = customRoundingMode;
         class MoneyUp extends Money {

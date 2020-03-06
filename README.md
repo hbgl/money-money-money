@@ -26,17 +26,18 @@ assert.equal('IRR', usNationalDebtIrr.currency);
 
 ## Truth in advertising
 
-You cannot format IRR 985474263166349355 using the built-in `toLocaleString` function because it relies on [`Intl.NumberFormat.format`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NumberFormat/format) which can only format a `Number`.
+You cannot format IRR 985474263166349355 precisely using the built-in `toLocaleString` function because it relies on [`Intl.NumberFormat.format`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NumberFormat/format) which itself can only format a floating point `Number`.
 
 ```javascript
 const money = new Money('985474263166349355', 'IRR');
 money.toLocaleString(); // throws Error
 ```
 
-If you are fine with the loss of accuracy then you can call `toLocaleStringUnchecked`.
+If you are fine with the loss of accuracy then you can call `toLocaleString` with the custom option `precisionHandling`.
 
 ```javascript
 const { Money } = require('moneta');
 const money = new Money('985474263166349355', 'IRR');
-console.assert('IRR 985,474,263,166,349,300' === money.toLocaleStringUnchecked());
+console.assert('IRR 985,474,263,166,349,300' === money.toLocaleString(undefined, { precisionHandling: 'unchecked' }));
+console.assert('~ IRR 985,474,263,166,349,300' === money.toLocaleString(undefined, { precisionHandling: 'show_imprecision' }));
 ```

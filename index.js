@@ -6,10 +6,18 @@ const Big = require('big.js');
  */
 const currencyNumberFormats = new Map();
 
-const BIG_ROUND_DOWN = 0;
-const BIG_ROUND_UP = 3;
-const BIG_ROUND_HALF_UP = 1;
-const BIG_ROUND_HALF_EVEN = 2;
+const RoundingMode = Object.freeze({
+    down: 0,
+    up: 3,
+    halfUp: 1,
+    halfEven: 2,
+});
+
+const PrecisionHandling = Object.freeze({
+    safe: 'safe',
+    unchecked: 'unchecked',
+    show_imprecision: 'show_imprecision',
+});
 
 class Money {
     /**
@@ -98,29 +106,49 @@ class Money {
     }
 
     toLocaleString(locale, options) {
-        const number = this.toSafeNumber();
-        options = Object.assign({
+        const formatOptions = Object.assign({
             style: 'currency',
             currency: this.currency,
         }, options);
+
         // If number is formatted as currency then the currency code cannot be overwritten.
-        if (options.style === 'currency') {
-            options.currency = this.currency;
+        if (formatOptions.style === 'currency' && formatOptions.currency !== this.currency) {
+            throw new Error('Overriding the currency via the \'currency\' option is not allowed.');
         }
-        return number.toLocaleString(locale, options);
+
+        let precisionHandling = formatOptions.precisionHandling;
+        if (precisionHandling === undefined) {
+            precisionHandling = PrecisionHandling.safe;
+        } else {
+            if (!Object.prototype.hasOwnProperty.call(PrecisionHandling, precisionHandling)) {
+                throw new Error(`Invalid value for option precisionHandling: ${precisionHandling}`);
+            }
+            // Do not expose custom option.
+            delete formatOptions.precisionHandling;
+        }
+
+        let number = null;
+        if (precisionHandling === PrecisionHandling.unchecked || precisionHandling === PrecisionHandling.show_imprecision) {
+            number = this.toNumberUnchecked();
+        } else {
+            number = this.toSafeNumber(); // Might throw
+        }
+
+        const formatted = number.toLocaleString(locale, formatOptions);
+        if (precisionHandling === PrecisionHandling.show_imprecision) {
+            return this.formatImprecision(formatted, locale, formatOptions);
+        }
+        return formatted;
     }
 
-    toLocaleStringUnchecked(locale, options) {
-        const number = this.toNumberUnchecked();
-        options = Object.assign({
-            style: 'currency',
-            currency: this.currency,
-        }, options);
-        // If number is formatted as currency then the currency code cannot be overwritten.
-        if (options.style === 'currency') {
-            options.currency = this.currency;
-        }
-        return number.toLocaleString(locale, options);
+    /**
+     * @protected
+     * @param {*} formatted
+     * @param {*} locale
+     * @param {*} options
+     */
+    formatImprecision(formatted) {
+        return '~ ' + formatted;
     }
 
     toDecimalString() {
@@ -185,23 +213,7 @@ class Money {
         return this.currency === other.currency;
     }
 
-    static get ROUND_DOWN() {
-        return BIG_ROUND_DOWN;
-    }
-
-    static get ROUND_UP() {
-        return BIG_ROUND_UP;
-    }
-
-    static get ROUND_HALF_UP() {
-        return BIG_ROUND_HALF_UP;
-    }
-
-    static get ROUND_HALF_EVEN() {
-        return BIG_ROUND_HALF_EVEN;
-    }
-
-    static get ROUND_DEFAULT() {
+    static get defaultRoundingMode() {
         return this.Big.RM;
     }
 
@@ -214,7 +226,7 @@ class Money {
      */
     static roundCurrencyFraction(big, currency, roundingMode) {
         const fractionDigits = getCurrencyFractionDigits(currency);
-        roundingMode = roundingMode !== undefined ? roundingMode : this.ROUND_DEFAULT;
+        roundingMode = roundingMode !== undefined ? roundingMode : this.defaultRoundingMode;
         return big.round(fractionDigits, roundingMode);
     }
 
@@ -298,4 +310,6 @@ function verifyCompatibleCurrency(op, currency1, currency2) {
 // Exports
 module.exports = {
     Money,
+    RoundingMode,
+    PrecisionHandling,
 };
