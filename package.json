@@ -1,6 +1,6 @@
 {
   "name": "money-money-money",
-  "version": "0.0.1-alpha",
+  "version": "0.0.4-alpha",
   "description": "A JavaScript library for dealing with money safely.",
   "main": "index.js",
   "scripts": {
