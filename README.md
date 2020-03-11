@@ -42,6 +42,15 @@ console.assert('IRR 985,474,263,166,349,300' === money.toLocaleString(undefined
 console.assert('~ IRR 985,474,263,166,349,300' === money.toLocaleString(undefined, { precisionHandling: 'show_imprecision' }));
 ```
 
+## Dependencies
+
+This library depends on [big.js](https://github.com/MikeMcl/big.js/) for arbitrary-precision decimal arithmetic.
+
+Additionally the environment must provide [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NumberFormat). It is used to determine how many decimal places the currency uses and for formatting. `Intl.NumberFormat` is supported by [all major browsers](https://caniuse.com/#feat=mdn-javascript_builtins_intl_numberformat) and all recent Node.js versions.
+
+**Please note:** By default, Node.js versions 12 and earlier [are built with small-icu](https://nodejs.org/docs/latest-v12.x/api/intl.html). This means that formatting may be unavailable for your locale. For more information see the [Node.js Internationalization Support](https://nodejs.org/docs/latest-v12.x/api/intl.html). Since Node version 13 the `full-icu` is included by default.
+
+
 ## License
 
 This library is licensed under the [MIT license](https://opensource.org/licenses/MIT).
