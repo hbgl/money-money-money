@@ -503,9 +503,9 @@ describe('toLocaleString', () => {
         it('works like \'safe\' precision handling for safe numbers', () => {
             toLocaleStringTests.forEach(test => {
                 const [_, money, locale, options] = test;
-                let formatOptions = Object.assign({ precisionHandling: PrecisionHandling.show_imprecision }, options);
-                const expected = money.toLocaleString(locale, formatOptions);
-                const formatted = money.toLocaleString(locale, formatOptions);
+                let optionsShowImprecision = Object.assign({ precisionHandling: PrecisionHandling.show_imprecision }, options);
+                const expected = money.toLocaleString(locale, options);
+                const formatted = money.toLocaleString(locale, optionsShowImprecision);
                 assert.equal(expected, formatted);
             });
         });

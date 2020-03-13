@@ -135,7 +135,7 @@ class Money {
         }
 
         const formatted = number.toLocaleString(locale, formatOptions);
-        if (precisionHandling === PrecisionHandling.show_imprecision) {
+        if (precisionHandling === PrecisionHandling.show_imprecision && !this.isSafeNumber()) {
             return this.formatImprecision(formatted, locale, formatOptions);
         }
         return formatted;
