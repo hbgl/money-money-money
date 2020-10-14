@@ -6,22 +6,36 @@
 
 A JavaScript library for dealing with money safely.
 
+## Installation
+
+```bash
+npm install money-money-money
+```
+
+## Basic usage
+
+```javascript
+const { Money } = require('money-money-money');
+const money = new Money('100', 'EUR');
+console.log(money.toLocaleString());
+```
+
 ## Why another money library?
 
 Have you ever tried to repesent the US national debt in Iranian rial?
 
 ```
-23405160032451 USD * 42105 IRR / USD = 985474263166349355 IRR
-at 3/5/2020 5:00:00 PM +00:00
+27067291392010 USD * 42105 IRR / USD = 1139668304060581050 IRR
 ```
 
 Many libraries would completely fail or silently lose accuracy. Not this one.
 
 ```javascript
-const usNationalDebtUsd = new Money('23405160032451', 'USD');
+const { Money } = require('money-money-money');
+const usNationalDebtUsd = new Money('27067291392010', 'USD');
 const usNationalDebtIrr = usNationalDebtUsd.convertCurrency('IRR', '42105');
-assert.equal('985474263166349355', usNationalDebtIrr.toDecimalString());
-assert.equal('IRR', usNationalDebtIrr.currency);
+console.assert('1139668304060581050' === usNationalDebtIrr.toDecimalString());
+console.assert('IRR' === usNationalDebtIrr.currency);
 ```
 
 ## Truth in advertising
@@ -29,17 +43,18 @@ assert.equal('IRR', usNationalDebtIrr.currency);
 You cannot format IRR 985474263166349355 precisely using the built-in `toLocaleString` function because it relies on [`Intl.NumberFormat.format`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NumberFormat/format) which itself can only format a floating point `Number`.
 
 ```javascript
-const money = new Money('985474263166349355', 'IRR');
+const { Money } = require('money-money-money');
+const money = new Money('1139668304060581050', 'IRR');
 money.toLocaleString(); // throws Error
 ```
 
 If you are fine with the loss of accuracy then you can call `toLocaleString` with the custom option `precisionHandling`.
 
 ```javascript
-const { Money } = require('moneta');
-const money = new Money('985474263166349355', 'IRR');
-console.assert('IRR 985,474,263,166,349,300' === money.toLocaleString(undefined, { precisionHandling: 'unchecked' }));
-console.assert('~ IRR 985,474,263,166,349,300' === money.toLocaleString(undefined, { precisionHandling: 'show_imprecision' }));
+const { Money } = require('money-money-money');
+const money = new Money('1139668304060581050', 'IRR');
+console.assert('IRR\u00A01,139,668,304,060,581,000' === money.toLocaleString(undefined, { precisionHandling: 'unchecked' }));
+console.assert('~\u00A0IRR\u00A01,139,668,304,060,581,000' === money.toLocaleString(undefined, { precisionHandling: 'show_imprecision' }));
 ```
 
 ## Dependencies

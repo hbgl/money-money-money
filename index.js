@@ -148,7 +148,7 @@ class Money {
      * @param {*} options
      */
     formatImprecision(formatted) {
-        return '~ ' + formatted;
+        return '~\u00A0' + formatted;
     }
 
     toDecimalString() {

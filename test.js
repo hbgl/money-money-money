@@ -511,9 +511,9 @@ describe('toLocaleString', () => {
         });
 
         const unsafeNumberTests = [
-            ['~ €12,341,234,123,412,340,000.00', m('12341234123412341234.12', EUR), 'en'],
-            ['~ €1,234,123,412,341,235.50', m('1234123412341235.51', EUR), 'en'],
-            ['~ €1234123412341235.5', m('1234123412341235.51', EUR), 'en', { useGrouping: false, minimumFractionDigits: 1, maximumFractionDigits: 1 }],
+            ['~\u00A0€12,341,234,123,412,340,000.00', m('12341234123412341234.12', EUR), 'en'],
+            ['~\u00A0€1,234,123,412,341,235.50', m('1234123412341235.51', EUR), 'en'],
+            ['~\u00A0€1234123412341235.5', m('1234123412341235.51', EUR), 'en', { useGrouping: false, minimumFractionDigits: 1, maximumFractionDigits: 1 }],
         ];
         unsafeNumberTests.forEach(test => {
             const [expected, money, locale, options] = test;
