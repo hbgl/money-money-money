@@ -40,7 +40,7 @@ console.assert('IRR' === usNationalDebtIrr.currency);
 
 ## Truth in advertising
 
-You cannot format IRR 985474263166349355 precisely using the built-in `toLocaleString` function because it relies on [`Intl.NumberFormat.format`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NumberFormat/format) which itself can only format a floating point `Number`.
+You cannot format IRR 1139668304060581050 precisely using the built-in `toLocaleString` function because it relies on [`Intl.NumberFormat.format`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NumberFormat/format) which itself can only format a floating point `Number`.
 
 ```javascript
 const { Money } = require('money-money-money');
