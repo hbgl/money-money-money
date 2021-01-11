@@ -1,6 +1,6 @@
 # Money Money Money
 
-[![Build Status](https://travis-ci.org/hbgl/money-money-money.svg?branch=master)](https://travis-ci.org/hbgl/money-money-money) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/hbgl/money-money-money/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/money-money-money.svg)](https://www.npmjs.com/package/money-money-money)
+![Node.js CI](https://github.com/hbgl/money-money-money/workflows/Node.js%20CI/badge.svg) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/hbgl/money-money-money/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/money-money-money.svg)](https://www.npmjs.com/package/money-money-money)
 
 <span style="color:firebrick;font-size:2em;">**This is a pre-release version. Use at your own risk.**</span>
 
