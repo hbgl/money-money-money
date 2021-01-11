@@ -1,6 +1,6 @@
 {
   "name": "money-money-money",
-  "version": "0.0.7-alpha",
+  "version": "0.0.8-alpha",
   "description": "A JavaScript library for dealing with money safely.",
   "main": "index.js",
   "scripts": {
@@ -12,13 +12,13 @@
   "homepage": "https://github.com/hbgl/money-money-money",
   "repository": "https://github.com/hbgl/money-money-money",
   "dependencies": {
-    "big.js": "5.2.2"
+    "big.js": "^6.0.3"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^6.8.0",
-    "lodash": "^4.17.19",
-    "mocha": "^7.1.0"
+    "eslint": "^7.17.0",
+    "lodash": "^4.17.20",
+    "mocha": "^8.2.0"
   },
   "keywords": [
     "money",
