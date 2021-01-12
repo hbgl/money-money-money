@@ -4,7 +4,7 @@
 
 <span style="color:firebrick;font-size:2em;">**This is a pre-release version. Use at your own risk.**</span>
 
-A JavaScript library for dealing with money safely.
+A JavaScript library for dealing with money, safely.
 
 ## Installation
 
